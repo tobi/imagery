@@ -19,4 +19,4 @@ end
 
 
 
-Dir[ File.dirname(__FILE__) + '/app/transformations/*.rb'].each { |f| require f } 
+Dir[ File.dirname(__FILE__) + '/transformations/*.rb'].each { |f| require f } 

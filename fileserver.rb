@@ -3,19 +3,22 @@ require 'sinatra'
 require 'sinatra/async'
 require 'eventmachine'
 
+require 'lib/transformations'
+require 'lib/remote_image'
+
 Sinatra.register Sinatra::Async
 
 
+# http://localhost:4567/s/files/1/0001/4168/products/t5_1_large.jpg
 # http://cdn.shopify.com/s/files/1/0001/4168/products/t5_1_large.jpg?1242853603
 
-aget '/products/:img' do |img|
+aget '/s/files/1/0001/4168/products/:img' do |img|
 
-  conn = EM::Protocols::HttpClient2.connect('cdn.shopify.com', 80)
+  image = RemoteImage.new('static.shopify.com', request.path)
   
-  conn.get("/s/files/1/0001/4168/products/#{img}").callback do |response|    
-    status    response.status    
-    headers   'Content-Length' => response.headers['content-length'], 'Content-Type' => response.headers['content-type']    
-    body      response.content    
+  image.create_from_original do |image|
+    headers   'Content-Length' => image.content.length.to_s, 'Content-Type' => image.content_type
+    body      image.content
   end
 end
 
