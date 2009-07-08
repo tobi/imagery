@@ -1,13 +1,14 @@
 require 'RMagick'
 require 'fileutils'
 
-class Image  
+class Image
   VARIANT_DELIMITER = '_'
-  attr_reader :path, :content
+  attr_accessor :content
+  attr_accessor :content_type
   
-  def initialize(path, content = nil)
-    @path = path, @content = content
-  end
+  ContentTypes = {'.gif' => 'image/gif', '.jpg' => 'image/jpeg', '.jpeg' => 'image/jpeg', '.png' => 'image/png', '.bmp' => 'image/x-bitmap'}
+
+  VariantParser = /(.*)\_(#{Transformations.list.join('|')})(#{ContentTypes.keys.join('|')})/      
         
   def basename
     File.basename(@path)
@@ -16,13 +17,9 @@ class Image
   def basename_no_ext
     File.basename(@path, ext)
   end
-  
+    
   def ext
     File.extname(@path)
-  end
-  
-  def full_dirname
-    File.dirname(@path)
   end
   
   def dirname
@@ -30,65 +27,40 @@ class Image
   end  
   
   # Returns true if the file is of a image type
-  def transformable?
-    ['.gif', '.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.tif'].include?(ext)
+  def image?
+    ContentTypes.has_key?(ext)
   end
-    
-  # create the image from an original 
-  def create_from_original!
-    
-    if original = find_original      
-      transform_with_transformations(transformations_from_to(original, @path), original, @path)
-    else
-      nil
-    end
-    
-    self
+
+  def content_type
+    @content_type || ContentTypes[ext] || 'application/octet-stream'
   end
   
-  def transform_to(target)
-    content = transform_with_transformations(transformations_from_to(@path, target), @path, target)
+  def transform_content(variant)
+    img = Magick::Image.from_blob(@content).first
+    transformation = Transformations[variant]
+    raise ArgumentError, "#{variant} is not a known transformation. (#{Transformations.list.join(', ')})" if transformation.nil?
+    img = transformation.call(img)      
+    raise ArgumentError, "Creating variant #{variant} for #{path} produced an error. Please return a Magick::Image" if img.nil?    
     
-    Image.new(target, content)
+
+    image = Image.new 
+    image.content_type = content_type
+    image.content = img.to_blob    
+    image
   end
   
-  private
+  def variant
+    basename =~ VariantParser ? $2 : nil
+  end
   
-  def transform_with_transformations(transformations, source, target)
-    img = transformations.inject( Magick::Image.read(source).first ) do |image, variation|
-      transformation = Transformations[variation]
-      raise ArgumentError, "#{variation} is not a known transformation. (#{Transformations.list.join(', ')})" if transformation.nil?
-      image = transformation.call(image)      
-      raise ArgumentError, "Creating variant #{variation} for #{path} produced an error. Please return a Magick::Image" if image.nil?
+  def variant?
+    variant
+  end
       
-      image
-    end
-    
-    img.to_blob
-  end
-  
-  def transformations_from_to(from, to)    
-    source = File.basename(from, File.extname(from))
-    target = File.basename(to, File.extname(to))  
-    
-    variants = target.dup
-    variants.sub!(/^#{Regexp.escape(source)}_?/,'')
-    
-    variants.split(VARIANT_DELIMITER)
-  end
-    
   # Reverse the filename to find the original image from which we can generate the desired 
   # transformation
-  def find_original
-    fragments = basename_no_ext.split(VARIANT_DELIMITER)
-    
-    possibilities = []
-    
-    (fragments.size-1).downto(1) do |pos|
-      possibilities.push File.join(dirname, fragments[0..pos-1].join(VARIANT_DELIMITER) + ext)
-    end
-    
-    possibilities.find { |path| File.exists?(path) }
+  def find_original_path    
+    basename =~ VariantParser ? File.join(dirname, $1) + $3 : nil
   end
 
   
