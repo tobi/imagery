@@ -35,18 +35,18 @@ class Image
     @content_type || ContentTypes[ext] || 'application/octet-stream'
   end
   
-  def transform_content(variant)
+  def cache_control
+    'public, max-age: 31557600'
+  end
+  
+  def transform_content!(variant)
     img = Magick::Image.from_blob(@content).first
     transformation = Transformations[variant]
     raise ArgumentError, "#{variant} is not a known transformation. (#{Transformations.list.join(', ')})" if transformation.nil?
     img = transformation.call(img)      
     raise ArgumentError, "Creating variant #{variant} for #{path} produced an error. Please return a Magick::Image" if img.nil?    
-    
-
-    image = Image.new 
-    image.content_type = content_type
-    image.content = img.to_blob    
-    image
+    self.content = img.to_blob
+    true
   end
   
   def variant
@@ -55,6 +55,10 @@ class Image
   
   def variant?
     variant
+  end
+  
+  def to_response
+    [200, {'Content-Type' => content_type, 'Content-Length' => content.length, 'Cache-Control' => cache_control}, [content]]
   end
       
   # Reverse the filename to find the original image from which we can generate the desired 

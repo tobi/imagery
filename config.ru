@@ -1,8 +1,7 @@
-#!/usr/bin/env rackup -s thin
+#!/usr/bin/env rackup -s thin -e none
 
 require 'rubygems'
 require 'rack/cache'
-require 'memcached'
 require 'rubygems'
 require 'sinatra'
 require 'logger'
@@ -13,7 +12,7 @@ $logger      = Logger.new(STDOUT)
 
 use Rack::Cache, 
   :verbose     => true, 
-  :metastore   => 'memcache://localhost:11211/meta',
+  :metastore   => 'memcached://localhost:11211/meta',
   :entitystore => 'file:/tmp/cache/rack/body'
 
-run Sinatra::Application
+run ImageServer.new

@@ -19,12 +19,13 @@ class RemoteImage < Image
   end
   
   def download(path = path)
-    query_path = "#{path}#{query_string}"
+    query_path = query_string.empty? ? path : "#{path}?#{query_string}"
+    
     $logger.info "Loading http://#{@server + query_path}"
     response = Net::HTTP.get_response(@server, query_path)
 
     @headers          = response
-    @status           = response.status.to_i
+    @status           = response.code.to_i
     
     if found?
       self.content      = response.body
@@ -39,8 +40,12 @@ class RemoteImage < Image
     @status == 200
   end
   
+  def cache_control
+    headers['Cache-Control']
+  end  
+  
   def download_original(&block)
-    image = RemoteImage.new(@server, find_original_path)
+    image = RemoteImage.new(@server, find_original_path, query_string)
     image.download
     image
   end  
