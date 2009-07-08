@@ -58,7 +58,7 @@ class Image
   end
   
   def to_response
-    [200, {'Content-Type' => content_type, 'Content-Length' => content.length, 'Cache-Control' => cache_control}, [content]]
+    [200, {'Content-Type' => content_type, 'Content-Length' => content.length.to_s, 'Cache-Control' => cache_control}, [content]]
   end
       
   # Reverse the filename to find the original image from which we can generate the desired 
