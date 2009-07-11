@@ -13,8 +13,7 @@ module Transformations
   
   def self.register(name, &block)
     @transformations[name.to_s] = Proc.new(&block)
-  end
-    
+  end    
 end
 
 
