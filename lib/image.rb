@@ -2,7 +2,6 @@ require 'RMagick'
 require 'fileutils'
 
 class Image
-  VARIANT_DELIMITER = '_'
   attr_accessor :content
   attr_accessor :content_type
   
@@ -24,7 +23,7 @@ class Image
   
   def dirname
     File.dirname(@path)
-  end  
+  end
   
   # Returns true if the file is of a image type
   def image?
@@ -42,10 +41,13 @@ class Image
   def transform_content!(variant)
     img = Magick::Image.from_blob(@content).first
     transformation = Transformations[variant]
-    raise ArgumentError, "#{variant} is not a known transformation. (#{Transformations.list.join(', ')})" if transformation.nil?
-    img = transformation.call(img)      
-    raise ArgumentError, "Creating variant #{variant} for #{path} produced an error. Please return a Magick::Image" if img.nil?    
-    self.content = img.to_blob
+    
+    Logger.current.info_with_time "Transforming image to #{variant}" do
+      raise ArgumentError, "#{variant} is not a known transformation. (#{Transformations.list.join(', ')})" if transformation.nil?
+      img = transformation.call(img)      
+      raise ArgumentError, "Creating variant #{variant} for #{path} produced an error. Please return a Magick::Image" if img.nil?    
+      self.content = img.to_blob
+    end
     true
   end
   
@@ -58,7 +60,7 @@ class Image
   end
   
   def to_response
-    [200, {'Content-Type' => content_type, 'Content-Length' => content.length.to_s, 'Cache-Control' => cache_control}, [content]]
+    [200, {'Content-Type' => content_type, 'Cache-Control' => cache_control}, [content]]
   end
       
   # Reverse the filename to find the original image from which we can generate the desired 

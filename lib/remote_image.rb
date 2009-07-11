@@ -21,8 +21,9 @@ class RemoteImage < Image
   def download(path = path)
     query_path = query_string.empty? ? path : "#{path}?#{query_string}"
     
-    $logger.info "Loading http://#{@server + query_path}"
-    response = Net::HTTP.get_response(@server, query_path)
+    response = Logger.current.info_with_time "Loading http://#{@server + query_path}" do
+      Net::HTTP.get_response(@server, query_path)
+    end
 
     @headers          = response
     @status           = response.code.to_i
@@ -31,7 +32,7 @@ class RemoteImage < Image
       self.content      = response.body
       true
     else
-      $logger.error "Not found"
+      Logger.current.error "Not found"
       false
     end
   end

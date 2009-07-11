@@ -2,20 +2,16 @@
 
 require 'rubygems'
 require 'rack/cache'
-require 'rubygems'
-require 'sinatra'
-require 'logger'
+require 'lib/middlewear/cache_purge'
+require 'lib/middlewear/logged_request'
 require 'image_server'
-require 'lib/cache_purge'
 
 
-OriginServer = 'static.shopify.com'
-$logger      = Logger.new(STDOUT)
+use LoggedRequest
 
 use Rack::Cache, 
-  :verbose     => true, 
-  :metastore   => 'memcached://localhost:11211/meta',
-  :entitystore => 'file:/tmp/cache/rack/body'
+  :metastore   => ENV['META_STORE'],
+  :entitystore => ENV['ENTITY_STORE']
 
 use CachePurge
 
