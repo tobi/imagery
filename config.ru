@@ -4,27 +4,28 @@ require 'rubygems'
 require 'rack/cache'
 require 'image_server'
 
-
+# 1. Forget about stupid favicons
 use FaviconFilter
 
-# 1. Log all incoming requests
+# 2. Log all other incoming requests
 use LoggedRequest
 
-# 0. Override server name
+# 3. Override server name into something non embarrasing
 use ServerName
 
-use Rack::ContentType, "text/plain"
+# 4. Content type needs to be present, default to attachment
+use Rack::ContentType, "application/octet-stream"
 
-# 2. Serve converted images directly from cache
+# 5. Serve converted images directly from cache
 use Rack::Cache, 
   :metastore   => ENV['META_STORE'],
   :entitystore => ENV['ENTITY_STORE']
 
-# 3. handle PURGE requests 
+# 6. handle PURGE requests 
 use CachePurge
 
-# 4. See if files already exist on remote host, if so handle them directly
+# 7. See if files already exist on remote host, if so handle them directly
 use RemoteProxy
 
-# 5. Otherwise run the image server and produce the missing images
+# 8. Otherwise run the image server and produce the missing images
 run ImageServer.new
