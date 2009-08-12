@@ -40,7 +40,7 @@ class Image
   
   def dirname
     File.dirname(@path)
-  end    
+  end
   
   private
     
