@@ -1,39 +1,36 @@
+require 'rubygems'
+require 'lib/send_file'
+require 'lib/middlewear/cache_purge'
+require 'lib/middlewear/logged_request'
+require 'lib/middlewear/remote_proxy'
+require 'lib/middlewear/server_name'
+require 'lib/middlewear/favicon_filter'
 require 'lib/logger_ext'
 require 'lib/transformations'
+require 'lib/svg_generator'
+require 'lib/image_variant_generator'
 require 'lib/image'
-require 'lib/remote_image'
 
 require 'config/environment'
 
 class ImageServer
+  include SendFile
+  
   NotFound = [404, {'Content-Type' => 'text/html'}, ['<h1>File not Found</h1>']].freeze
-  
-  def initialze(options = {})
-    @options = options    
-  end  
-  
-  def call(env)
-    request = Rack::Request.new(env)
-    
-    requested_file = RemoteImage.new(ORIGIN_SERVER, request.path, request.query_string)  
-  
-    # If file exists we simply sent it to the client.         
-    if requested_file.download
-      
-      return requested_file.to_response
-
-    # If it doesn't exist but it's an image and a variant was requested we will
-    # go look for the original image and resize it according to the request.  
-    elsif requested_file.image? && requested_file.variant?
         
-      origin_file = RemoteImage.new(ORIGIN_SERVER, requested_file.find_original_path, request.query_string)
-      if origin_file.download
-        origin_file.transform_content!(requested_file.variant)
-
-        return origin_file.to_response
+  def call(env)    
+    Logger.current.info 'Attempting to generate missing file...'
+    
+    [SvgGenerator, ImageVariantGenerator].each do |generator|                
+      if image = generator.from_url(ORIGIN_SERVER, env['PATH_INFO'] + (env['QUERY_STRING'].empty? ? '' : "?#{env['QUERY_STRING']}"))        
+                
+        return send_file(image)
       end
     end
-
-    NotFound        
+    
+    Logger.current.info 'No generator available'
+    
+    NotFound
   end
+  
 end

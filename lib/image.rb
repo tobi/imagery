@@ -1,14 +1,31 @@
 require 'RMagick'
 require 'fileutils'
+require 'net/http'
 
 class Image
   attr_accessor :content
-  attr_accessor :content_type
+  attr_reader :headers
+  attr_reader :status
+  attr_reader :server
   
-  ContentTypes = {'.gif' => 'image/gif', '.jpg' => 'image/jpeg', '.jpeg' => 'image/jpeg', '.png' => 'image/png', '.bmp' => 'image/x-bitmap'}
+  def initialize(server, path)
+    @server = server
+    @path = path    
+    download(path)
+  end
+  
+  def content_type
+    headers['Content-Type']
+  end
+  
+  def cache_control
+    headers['Cache-Control']
+  end      
 
-  VariantParser = /(.*)\_(#{Transformations.list.join('|')})(#{ContentTypes.keys.join('|')})/      
-        
+  def found?
+    @status == 200
+  end  
+  
   def basename
     File.basename(@path)
   end
@@ -23,52 +40,26 @@ class Image
   
   def dirname
     File.dirname(@path)
-  end
+  end    
   
-  # Returns true if the file is of a image type
-  def image?
-    ContentTypes.has_key?(ext)
-  end
-
-  def content_type
-    @content_type || ContentTypes[ext] || 'application/octet-stream'
-  end
-  
-  def cache_control
-    'public, max-age: 31557600'
-  end
-  
-  def transform_content!(variant)
-    img = Magick::Image.from_blob(@content).first
-    transformation = Transformations[variant]
+  private
     
-    Logger.current.info_with_time "Transforming image to #{variant}" do
-      raise ArgumentError, "#{variant} is not a known transformation. (#{Transformations.list.join(', ')})" if transformation.nil?
-      img = transformation.call(img)      
-      raise ArgumentError, "Creating variant #{variant} for #{path} produced an error. Please return a Magick::Image" if img.nil?    
-      self.content = img.to_blob
+  def download(path_info)      
+    response = Logger.current.info_with_time "Loading http://#{server}#{path_info}" do
+      Net::HTTP.get_response(server, path_info)
     end
-    true
-  end
-  
-  def variant
-    basename =~ VariantParser ? $2 : nil
-  end
-  
-  def variant?
-    variant
-  end
-  
-  def to_response
-    [200, {'Content-Type' => content_type, 'Cache-Control' => cache_control}, [content]]
-  end
-      
-  # Reverse the filename to find the original image from which we can generate the desired 
-  # transformation
-  def find_original_path    
-    basename =~ VariantParser ? File.join(dirname, $1) + $3 : nil
-  end
 
-  
+    @path    = path_info.split('?')[0]
+    @headers = response
+    @status  = response.code.to_i
+      
+    if found?
+      self.content      = response.body
+      true
+    else
+      Logger.current.error "Not found"
+      false
+    end
+  end
 end
 

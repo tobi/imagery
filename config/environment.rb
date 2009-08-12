@@ -1,5 +1,4 @@
 # Image server configuration file
-
 RACK_ENV    = ENV['RACK_ENV'] || 'development'
 
 
@@ -16,4 +15,4 @@ ENV['ENTITY_STORE'] = 'file:/tmp/cache/rack/body'
 
 
 # Logging
-Logger.current = RequestAwareLogger.new("log/#{RACK_ENV}.log")
+Logger.current = RequestAwareLogger.new(File.dirname(__FILE__) + "/../log/#{RACK_ENV}.log")
