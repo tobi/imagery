@@ -1,6 +1,6 @@
 require 'RMagick'
 require 'fileutils'
-require 'net/http'
+require 'patron'
 
 class Image
   attr_accessor :content
@@ -43,15 +43,26 @@ class Image
   end
   
   private
+  
+  def session
+    @@session ||= begin
+      sess = Patron::Session.new
+      sess.timeout = 10      
+      sess.headers['User-Agent'] = 'imagery/1.0'
+      sess
+    end
+  end
     
-  def download(path_info)      
+  def download(path_info)          
+    session.base_url = "http://#{server}"
+    
     response = Logger.current.info_with_time "Loading http://#{server}#{path_info}" do
-      Net::HTTP.get_response(server, path_info)
+      session.get(path_info)
     end
 
     @path    = path_info.split('?')[0]
-    @headers = response
-    @status  = response.code.to_i
+    @headers = response.headers
+    @status  = response.status
       
     if found?
       self.content      = response.body
