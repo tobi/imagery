@@ -6,7 +6,7 @@ class ServerName
 
   def call(env)     
     hash = @app.call(env)
-    hash[1]['Server'] = 'Shopify Assets'
+    hash[1]['Server'] = 'Shopify Imagery'
     hash
   end
 end
