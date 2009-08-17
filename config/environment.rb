@@ -10,6 +10,8 @@ ORIGIN_SERVER = ENV['ORIGIN_SERVER'] || 'static.shopify.com'
 # Middleware configuration
 # recommended to be memcached for meta and disk for entities. 
 
+require 'memcached'
+
 ENV['META_STORE']   = 'memcached://localhost:11211/meta'
 ENV['ENTITY_STORE'] = 'file:/tmp/cache/rack/body'
 
