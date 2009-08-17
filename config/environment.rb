@@ -12,7 +12,7 @@ ORIGIN_SERVER = ENV['ORIGIN_SERVER'] || 'static.shopify.com'
 
 require 'memcached'
 
-ENV['META_STORE']   = 'memcached://localhost:11211/meta'
+ENV['META_STORE']   = 'memcache://127.0.0.1:11211/meta'
 ENV['ENTITY_STORE'] = 'file:/tmp/cache/rack/body'
 
 
