@@ -2,7 +2,14 @@
 
 require 'rubygems'
 require 'rack/cache'
+require 'rack/contrib'
 require 'image_server'
+
+# Add rack sendfile extension.
+# Allows us to serve cache hits directly from file system 
+# by nginx (big speed boost). read: 
+# http://github.com/rack/rack-contrib/blob/5ea5e585a43669842314aa07f1e603be70d6e288/lib/rack/contrib/sendfile.rb
+use Rack::Sendfile
 
 # 1. Forget about stupid favicons
 use FaviconFilter
