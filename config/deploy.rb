@@ -3,7 +3,7 @@ set :repository,  "git://github.com/tobi/image_server.git"
 set :branch,      "origin/master"
 set :user,        'deploy'                            
 
-role :app, instance = "vm"
+role :app, instance = ENV['INSTANCE'] || "vm"
                                               
 namespace :deploy do
   desc "Deploy it"
