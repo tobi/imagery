@@ -14,14 +14,6 @@ class Image
     download(path)
   end
   
-  def content_type
-    headers['Content-Type']
-  end
-  
-  def cache_control
-    headers['Cache-Control']
-  end      
-
   def found?
     @status == 200
   end  

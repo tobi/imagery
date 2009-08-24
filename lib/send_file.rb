@@ -1,4 +1,9 @@
+require 'time'
+
 module SendFile
+  
+  CopyHeaders = ['Content-Type', 'Cache-Control', 'Last-Modified', 'ETag']
+  
   ContentTypes = { 
       '.gif'  => 'image/gif', 
       '.jpg'  => 'image/jpeg', 
@@ -8,11 +13,19 @@ module SendFile
       '.svg'  => 'image/svg+xml'
     }
   
-  def send_file(file)
+  def send_file(file)    
+    headers = {'Content-Length' => file.content.length}
     
-    cache_control = file.respond_to?(:cache_control) ? file.cache_control : 'public, max-age: 31557600'
-    content_type  = file.respond_to?(:content_type)  ? file.content_type || ContentTypes[file.ext] || raise(ArgumentError, 'illegal content type') : 'application/octet-stream'
+    if file.respond_to?(:headers)
+      CopyHeaders.each do |key|
+        headers[key] = file.headers[key] if file.headers.has_key?(key)
+      end
+    end
     
-    [200, {'Content-Type' => content_type, 'Cache-Control' => cache_control, 'Content-Length' => file.content.length}, [file.content]]
+    headers['ETag']           ||= Digest::MD5.hexdigest(file.content)
+    headers['Cache-Control']  ||= 'public, max-age: 31557600'
+    headers['Last-Modified']  ||= Time.new.httpdate
+
+    [200, headers, [file.content]]
   end  
 end
