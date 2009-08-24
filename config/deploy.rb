@@ -20,13 +20,14 @@ namespace :deploy do
  
   desc "Update the deployed code."
   task :update_code, :except => { :no_release => true } do
-    run "cd #{current_path}; git fetch origin; git reset --hard #{branch}"
+    run "cd #{current_path}; git fetch origin; git reset --hard #{branch}; git tag 'deploy-#{Time.now.to_i}'"
   end
  
   namespace :rollback do 
     desc "Rollback a single commit."
     task :default, :except => { :no_release => true } do
-      set :branch, "HEAD^"
+      branch = capture("cd #{current_path}; git tag -l 'deploy*' | tail -n2 | head -n1")
+      set :branch, branch
       default
     end
   end
