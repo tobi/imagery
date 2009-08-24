@@ -21,3 +21,7 @@ end
 Transformations.register :large do |image|  
   image.change_geometry("480x480>") { |x, y, image| image.resize!(x,y) }
 end
+
+Transformations.register :grande do |image|  
+  image.change_geometry("600x600>") { |x, y, image| image.resize!(x,y) }
+end
