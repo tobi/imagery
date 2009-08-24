@@ -21,18 +21,18 @@ namespace :deploy do
  
   desc "Update the deployed code."
   task :update_code, :except => { :no_release => true } do
-    run "cd #{current_path}; git fetch origin; git reset --hard #{branch}; git tag '#{deploy_type}-#{Time.now.to_i}'"
+    run "cd #{current_path}; git fetch origin; git reset --hard #{branch}; git tag '#{Time.now.to_i}-#{deploy_type}'"
   end
 
   desc "List deployment tags for use with deploy:rollback TAG="
   task :list_tags, :except => { :no_release => true } do
-    run "cd #{current_path}; git tag -l 'deploy*' -n 3"
+    run "cd #{current_path}; git tag -l '*-deploy' -n 3"
   end
  
   namespace :rollback do 
     desc "Rollback a single commit."
     task :default, :except => { :no_release => true } do
-      branch = ENV['TAG'] || capture("cd #{current_path}; git tag -l 'deploy*' | tail -n2 | head -n1")
+      branch = ENV['TAG'] || capture("cd #{current_path}; git tag -l '*-deploy' | tail -n2 | head -n1")
       set :deploy_type, 'rollback'
       set :branch, branch
       deploy.default
