@@ -10,6 +10,7 @@ require 'image_server'
 # by nginx (big speed boost). read: 
 # http://github.com/rack/rack-contrib/blob/5ea5e585a43669842314aa07f1e603be70d6e288/lib/rack/contrib/sendfile.rb
 use Rack::Sendfile
+use Rack::ShowExceptions
 
 # 1. Forget about stupid favicons
 use FaviconFilter
