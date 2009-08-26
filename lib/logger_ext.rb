@@ -23,6 +23,19 @@ class RequestAwareLogger < Logger
     @intend = false
   end
   
+  def buffer
+    @buffer = []
+    begin
+      yield
+    ensure
+      buffer = @buffer
+      @buffer = nil
+      buffer.each do |method, msg|
+        self.send(method, msg)
+      end      
+    end
+    
+  end
   
   def info_with_time(msg)
     result = nil
@@ -31,9 +44,16 @@ class RequestAwareLogger < Logger
     result
   end
   
-  [:info, :warn, :error].each do |level|
+  [:info, :warn, :error, :debug].each do |level|
     define_method(level) do |msg|
-      @intend ? super("  " + msg) : super
+      
+      msg = @intend ? "  " + msg : msg
+      
+      if @buffer
+        @buffer << [level, msg]
+      else
+        super(msg)
+      end
     end
   end
   

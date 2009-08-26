@@ -44,3 +44,12 @@ namespace :deploy do
     run "mkdir -p #{current_path}/tmp && touch #{current_path}/tmp/restart.txt"
   end
 end
+
+namespace :logs do
+  
+  desc "Watch jobs log"
+  task :default do 
+    sudo "tail -f #{current_path}/log/production.log"
+  end
+  
+end
