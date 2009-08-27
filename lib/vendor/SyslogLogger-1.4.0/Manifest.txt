@@ -1,0 +1,7 @@
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+lib/analyzer_tools/syslog_logger.rb
+lib/syslog_logger.rb
+test/test_syslog_logger.rb

@@ -22,5 +22,9 @@ ENV['ENTITY_STORE'] = 'file:/mnt/data/cache/rack/body'
 
 
 # Logging
-Logger.current = RequestAwareLogger.new(File.dirname(__FILE__) + "/../log/#{RACK_ENV}.log")
+if RACK_ENV == 'production'
+  Logger.current = SyslogLogger.new('rack.imagery')  
+else
+  Logger.current = Logger.new(File.dirname(__FILE__) + "/../log/#{RACK_ENV}.log")
+end
 
