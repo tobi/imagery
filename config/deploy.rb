@@ -28,6 +28,8 @@ namespace :deploy do
   task :list_tags, :except => { :no_release => true } do
     run "cd #{current_path}; git tag -l '*-deploy' -n 3"
   end
+  
+  begin
  
   namespace :rollback do 
     desc "Rollback a single commit."
@@ -38,6 +40,19 @@ namespace :deploy do
       deploy.default
     end
   end
+  
+  rescue ArgumentError
+    
+    desc "Rollback a single commit."
+    task :rollback, :except => { :no_release => true } do
+      branch = ENV['TAG'] || capture("cd #{current_path}; git tag -l '*-deploy' | tail -n2 | head -n1")
+      set :deploy_type, 'rollback'
+      set :branch, branch
+      deploy.default
+    end
+    
+  end
+  
   
   desc "Signal Passenger to restart the application"
   task :restart, :roles => :app do
