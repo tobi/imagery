@@ -23,7 +23,7 @@ module SendFile
     end
     
     headers['ETag']           ||= Digest::MD5.hexdigest(file.content)
-    headers['Cache-Control']  ||= 'public, max-age: 31557600'
+    headers['Cache-Control']  ||= 'public, max-age=31557600'
     headers['Last-Modified']  ||= Time.new.httpdate
 
     [200, headers, [file.content]]
