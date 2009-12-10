@@ -14,6 +14,10 @@ Transformations.register :small do |image|
   image.change_geometry("100x100>") { |x, y, image| image.resize!(x,y) }
 end
 
+Transformations.register :compact do |image|  
+  image.change_geometry("160x160>") { |x, y, image| image.resize!(x,y) }
+end
+
 Transformations.register :medium do |image|  
   image.change_geometry("240x240>") { |x, y, image| image.resize!(x,y) }
 end
