@@ -14,7 +14,7 @@ module SendFile
     }
   
   def send_file(file)    
-    headers = {'Content-Length' => file.content.length}
+    headers = {'Content-Length' => file.content.length.to_s}
     
     if file.respond_to?(:headers)
       CopyHeaders.each do |key|

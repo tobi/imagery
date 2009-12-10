@@ -17,8 +17,9 @@ ORIGIN_SERVER = $settings['origin_server'] || 'shopify.s3.amazonaws.com'
 
 require 'memcached'
 
+ENV['CACHE_LOCATION'] = '/mnt/data/cache/rack/body'
 ENV['META_STORE']   = 'memcache://127.0.0.1:11211/meta'
-ENV['ENTITY_STORE'] = 'file:/mnt/data/cache/rack/body'
+ENV['ENTITY_STORE'] = "file:#{ENV['CACHE_LOCATION']}"
 
 
 # Logging
