@@ -8,28 +8,32 @@ rescue LoadError
 end
 
 class Logger
-  
+
   module Extensions
+    def self.included(base)
+      base.send(:define_method, :mutex) {@mutex ||= Mutex.new}
+    end
 
     def intend
       @intend = true
       yield
-    ensure 
+    ensure
       @intend = false
     end
 
     def buffer
-      @buffer = []
-      begin
-        yield
-      ensure
-        buffer = @buffer
-        @buffer = nil
-        buffer.each do |method, msg|
-          self.send(method, msg)
-        end      
+      self.mutex.synchronize do
+        @buffer = []
+        begin
+          yield
+        ensure
+          buffer = @buffer
+          @buffer = nil
+          buffer.each do |method, msg|
+            self.send(method, msg)
+          end
+        end
       end
-
     end
 
     def info_with_time(msg)
@@ -53,11 +57,11 @@ class Logger
     end
 
   end
-  
+
   def self.current
     @logger
   end
-  
+
   def self.current=(logger)
     @logger = logger
   end
