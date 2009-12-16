@@ -9,7 +9,7 @@ class RemoteProxy
   def call(env)
     request = Rack::Request.new(env)
         
-    requested_file = Image.new(ORIGIN_SERVER, env['PATH_INFO'] + (env['QUERY_STRING'].empty? ? '' : "?#{env['QUERY_STRING']}"))
+    requested_file = Image.new(env['imagery.origin_host'], env['PATH_INFO'] + (env['QUERY_STRING'].empty? ? '' : "?#{env['QUERY_STRING']}"))
   
     # If file exists we simply sent it to the client.         
     if requested_file.found?

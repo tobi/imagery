@@ -6,6 +6,12 @@ require 'rack/contrib'
 require 'image_server'
 require 'config/env'
 
+
+use Rack::Config do |env|
+  env['imagery.origin_host'] = ORIGIN_SERVER
+end
+
+
 # Add rack sendfile extension.
 # Allows us to serve cache hits directly from file system 
 # by nginx (big speed boost). read: 
