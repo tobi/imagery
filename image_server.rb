@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'lib/send_file'
 require 'lib/middleware/cache_purge'
 require 'lib/middleware/logged_request'
