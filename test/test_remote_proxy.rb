@@ -16,7 +16,7 @@ require 'config/env'
 class TestRemoteProxy < Test::Unit::TestCase
   StandardResponse = [200, {}, ['OK']]
   ExpectedResponse = [200,
-   {"Cache-Control"=>"public, max-age=0", "Content-Type"=>"text/plain", "ETag"=>"abc", "Content-Length"=>12, 'Last-Modified' => "Mon, 24 Aug 2009 18:07:15 GMT"},
+   {"Cache-Control"=>"public, max-age=0", "Content-Type"=>"text/plain", "ETag"=>"abc", "Content-Length"=>"12", 'Last-Modified' => "Mon, 24 Aug 2009 18:07:15 GMT"},
    ["Hello World!"]]
   
   def setup
