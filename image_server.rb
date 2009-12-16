@@ -10,8 +10,6 @@ require 'lib/svg_generator'
 require 'lib/image_variant_generator'
 require 'lib/image'
 
-require 'config/env'
-
 class ImageServer
   include SendFile
   

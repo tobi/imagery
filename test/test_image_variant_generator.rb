@@ -6,6 +6,7 @@ require 'fakeweb'
 require 'mocha'
 require 'rack'
 require File.dirname(__FILE__) + '/../image_server'
+require 'config/env'
 
 FakeWeb.allow_net_connect = false
 FakeWeb.register_uri(:get, "http://static.shopify.com/image.png", :body => File.read( File.dirname(__FILE__) + '/assets/fish.png'), :content_type => "image/png", :cache_control => 'public, max-age=0')

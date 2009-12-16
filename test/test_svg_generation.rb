@@ -5,6 +5,7 @@ require 'rubygems'
 require 'mocha'
 require 'rack'
 require File.dirname(__FILE__) + '/../image_server'
+require 'config/env'
 
 
 class TestRemoteProxy < Test::Unit::TestCase

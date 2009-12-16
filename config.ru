@@ -4,6 +4,7 @@ require 'rubygems'
 require 'rack/cache'
 require 'rack/contrib'
 require 'image_server'
+require 'config/env'
 
 # Add rack sendfile extension.
 # Allows us to serve cache hits directly from file system 
