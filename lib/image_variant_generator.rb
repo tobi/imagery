@@ -4,13 +4,16 @@ require 'fileutils'
 class ImageVariantGenerator
   VARIANT_DELIMITER = '_'  
   SupportedImageTypes = ['.gif', '.jpg', '.jpeg', '.png', '.bmp']
-  VariantParser = /(.*)\_(#{Transformations.list.join('|')})(#{SupportedImageTypes.join('|')})/i  
   
   attr_accessor :content
   attr_accessor :content_type
-            
+
+  def self.variant_parser
+    @variant_parser ||= /(.*)\_(#{Transformations.list.join('|')})(#{SupportedImageTypes.join('|')})/i
+  end
+
   def self.from_url(server, path)
-    return nil unless path =~ VariantParser
+    return nil unless path =~ variant_parser
         
     remote_path = "#{$1}#{$3}"     
     
