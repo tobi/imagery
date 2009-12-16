@@ -1,12 +1,4 @@
-$LOAD_PATH.unshift '..'
-
-require "test/unit"
-require 'rubygems'
-require 'mocha'
-require 'rack'
-require File.dirname(__FILE__) + '/../image_server'
-require 'config/env'
-
+require File.join(File.dirname(__FILE__), 'helper')
 
 class TestRemoteProxy < Test::Unit::TestCase
   StandardResponse = [200, {}, ['OK']]

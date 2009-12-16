@@ -1,12 +1,4 @@
-$LOAD_PATH.unshift '..'
-
-require "test/unit"
-require 'rubygems'
-require 'rack'
-require 'mocha'
-
-require File.dirname(__FILE__) + '/../image_server'
-require 'config/env'
+require File.join(File.dirname(__FILE__), 'helper')
 
 # FakeWeb.allow_net_connect = false
 # FakeWeb.register_uri(:get, "http://static.shopify.com/test.txt", :body => "Hello World!", :content_type => "text/plain", :cache_control => 'public, max-age=0')
