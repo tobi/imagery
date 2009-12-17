@@ -19,18 +19,18 @@ class TestRemoteProxy < Test::Unit::TestCase
   end
   
   def test_successfull_call
-    assert ImageVariantGenerator.from_url('static.shopify.com', '/image_pico.png')        
-    assert ImageVariantGenerator.from_url('static.shopify.com', '/image_small.png')        
+    assert Imagery::ImageVariantGenerator.from_url('static.shopify.com', '/image_pico.png')        
+    assert Imagery::ImageVariantGenerator.from_url('static.shopify.com', '/image_small.png')        
   end  
   
   def test_return_nil_on_404
-    assert_equal nil, ImageVariantGenerator.from_url('static.shopify.com', '/failed_image_pico.png')        
+    assert_equal nil, Imagery::ImageVariantGenerator.from_url('static.shopify.com', '/failed_image_pico.png')        
   end
 
   def test_wrong_filename
-    assert_equal nil, ImageVariantGenerator.from_url('static.shopify.com', '/image.png')
-    assert_equal nil, ImageVariantGenerator.from_url('static.shopify.com', '/image_whatever.png')
-    assert_equal nil, ImageVariantGenerator.from_url('static.shopify.com', '/image.tga')
+    assert_equal nil, Imagery::ImageVariantGenerator.from_url('static.shopify.com', '/image.png')
+    assert_equal nil, Imagery::ImageVariantGenerator.from_url('static.shopify.com', '/image_whatever.png')
+    assert_equal nil, Imagery::ImageVariantGenerator.from_url('static.shopify.com', '/image.tga')
   end
 
 end

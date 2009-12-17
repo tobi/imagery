@@ -3,7 +3,9 @@
 require 'rubygems'
 require 'rack/cache'
 require 'rack/contrib'
-require 'image_server'
+
+$: << File.join(File.dirname(__FILE__), 'lib')
+require 'imagery'
 require 'config/env'
 
 
@@ -20,8 +22,8 @@ end
 
 if ENV['NGINX_ACCEL_REDIRECTS']
   STDERR.puts 'Using accel redirect (Shopify config).'
-  require 'lib/middleware/accel_redirect'
-  use AccelRedirect
+  require 'imagery/middleware/accel_redirect'
+  use Imagery::AccelRedirect
 else
   use Rack::Sendfile
 end
@@ -29,13 +31,13 @@ end
 use Rack::ShowExceptions
 
 # 1. Forget about stupid favicons
-use FaviconFilter
+use Imagery::FaviconFilter
 
 # 2. Log all other incoming requests
-use LoggedRequest
+use Imagery::LoggedRequest
 
 # 3. Override server name into something non embarrasing
-use ServerName
+use Imagery::ServerName
 
 # 4. Content type needs to be present, default to attachment
 use Rack::ContentType, "application/octet-stream"
@@ -46,10 +48,10 @@ use Rack::Cache,
   :entitystore => ENV['ENTITY_STORE']
 
 # 6. handle PURGE requests 
-use CachePurge
+use Imagery::CachePurge
 
 # 7. See if files already exist on remote host, if so handle them directly
-use RemoteProxy
+use Imagery::RemoteProxy
 
 # 8. Otherwise run the image server and produce the missing images
-run ImageServer.new
+run Imagery::Server.new

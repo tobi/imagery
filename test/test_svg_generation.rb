@@ -10,14 +10,14 @@ class TestRemoteProxy < Test::Unit::TestCase
   def test_successfull_call
     Patron::Session.any_instance.expects(:get).with('/image.svg').returns( stub(:headers => {}, :body =>  File.read( File.dirname(__FILE__) + '/assets/fish.svg'), :status => 200))
     
-    assert SvgGenerator.from_url('static.shopify.com', '/image.svg.png')        
+    assert Imagery::SvgGenerator.from_url('static.shopify.com', '/image.svg.png')        
   end
 
   def test_wrong_filename
     
-    assert_equal nil, SvgGenerator.from_url('static.shopify.com', '/image.svg')
-    assert_equal nil, SvgGenerator.from_url('static.shopify.com', '/image.png')
-    assert_equal nil, SvgGenerator.from_url('static.shopify.com', '/image.svg.bmp')
+    assert_equal nil, Imagery::SvgGenerator.from_url('static.shopify.com', '/image.svg')
+    assert_equal nil, Imagery::SvgGenerator.from_url('static.shopify.com', '/image.png')
+    assert_equal nil, Imagery::SvgGenerator.from_url('static.shopify.com', '/image.svg.bmp')
   end
 
 end

@@ -27,7 +27,7 @@ class TestRemoteProxy < Test::Unit::TestCase
     )
     
     
-    @app = RemoteProxy.new lambda { StandardResponse }
+    @app = Imagery::RemoteProxy.new lambda { StandardResponse }
   end
   
   def test_successfull_call
